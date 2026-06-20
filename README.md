@@ -45,11 +45,11 @@ This project demonstrates the complete deployment of a full-stack Student Regist
       └────────┬────────┘            └────────┬────────┘
                │                              │
                ▼                              ▼
-      ┌─────────────────┐            ┌─────────────────┐
+      ┌──────────────────┐           ┌─────────────────┐
       │ React Application│           │ Spring Boot API │
-      └─────────────────┘            └────────┬────────┘
-                                               │
-                                               ▼
+      └──────────────────┘           └────────┬────────┘
+                                              │
+                                              ▼
                                      ┌─────────────────┐
                                      │ MariaDB         │
                                      │ StatefulSet     │
@@ -60,6 +60,7 @@ This project demonstrates the complete deployment of a full-stack Student Regist
                                      │ AWS EBS Volume  │
                                      └─────────────────┘
 Project Structure
+```tree
 student-registration-app/
 │
 ├── README.md
@@ -89,6 +90,7 @@ student-registration-app/
     ├── secret.yml
     ├── sts.yml
     └── svc.yml
+```
 ```text
 User
  ↓
