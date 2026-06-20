@@ -8,20 +8,20 @@ Open:
 
 ## pom.xml
 
-Add Spring Boot Actuator:
+```Add Spring Boot Actuator:
 
 <dependency>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-actuator</artifactId>
 </dependency>
-
-Add Prometheus Registry:
+```
+```Add Prometheus Registry:
 
 <dependency>
     <groupId>io.micrometer</groupId>
     <artifactId>micrometer-registry-prometheus</artifactId>
 </dependency>
-
+```
 
 # Phase 10 - Backend Deployment
 
