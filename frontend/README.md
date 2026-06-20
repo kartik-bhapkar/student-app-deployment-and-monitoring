@@ -125,7 +125,7 @@ kubectl get svc
 
 ---
 
-# Phase 10 - Ingress Configuration
+# Phase 19 - Ingress Configuration
 
 Create:
 
@@ -187,7 +187,7 @@ Expected:
 
 ---
 
-# Phase 11 - Application Validation
+# Phase 20 - Application Validation
 
 Check all resources:
 
