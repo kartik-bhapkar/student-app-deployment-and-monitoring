@@ -2,7 +2,7 @@ backend of the student-deployment application
 
 ---
 
-Phase 1 - Add Required Dependencies
+# Phase 12 - Add Required Dependencies
 
 Open:
 
@@ -24,7 +24,7 @@ Open:
 </dependency>
 ```
 
-# Phase 10 - Backend Deployment
+# Phase 13 - Backend Deployment
 
 ## application.properties Changes
 
@@ -82,7 +82,7 @@ docker push kartikbhapkar07/monitor-be:latest
 
 ---
 
-# Step 6 - Backend Deployment
+# Phase 14 - Backend Deployment
 
 deploy.yml
 
@@ -131,7 +131,7 @@ Verify:
 ```bash
 kubectl get deployments
 ```
-# Step 7 - Backend Service
+# Phase 15 - Backend Service
 
 svc.yml
 
@@ -176,7 +176,7 @@ Check endpoints:
 ```bash
 kubectl get endpoints
 ```
-Step 8 - Configure HPA
+# Phase 16 - Configure HPA
 
 hpa.yml
 ```yaml
@@ -214,7 +214,7 @@ Verify:
 ```bash
 kubectl get hpa
 ```
-# Step 9 - Configure ServiceMonitor
+# Phase 17 - Configure ServiceMonitor
 
 servicemonitor.yml
 ```yaml
