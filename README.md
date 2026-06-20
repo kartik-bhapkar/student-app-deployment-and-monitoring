@@ -23,24 +23,42 @@ This project demonstrates the complete deployment of a full-stack Student Regist
 
 # Architecture
 
-Architecture
-User
- │
-AWS Load Balancer
- │
-NGINX Ingress Controller
- │
- |──────────── Frontend Service
- │                     │
- │              React Application
- │
-Backend Service
- │
-Spring Boot Application
- │
-MariaDB StatefulSet
- │
-AWS EBS Volume
+                                ┌───────────────┐
+                                │     User      │
+                                └───────┬───────┘
+                                        │
+                                        ▼
+                        ┌─────────────────────────┐
+                        │ AWS Load Balancer (ALB) │
+                        └───────────┬─────────────┘
+                                    │
+                                    ▼
+                    ┌─────────────────────────────┐
+                    │ NGINX Ingress Controller    │
+                    └───────────┬─────────────────┘
+                                │
+                ┌───────────────┴───────────────┐
+                │                               │
+                ▼                               ▼
+      ┌─────────────────┐            ┌─────────────────┐
+      │ Frontend Service│            │ Backend Service │
+      └────────┬────────┘            └────────┬────────┘
+               │                              │
+               ▼                              ▼
+      ┌─────────────────┐            ┌─────────────────┐
+      │ React Application│           │ Spring Boot API │
+      └─────────────────┘            └────────┬────────┘
+                                               │
+                                               ▼
+                                     ┌─────────────────┐
+                                     │ MariaDB         │
+                                     │ StatefulSet     │
+                                     └────────┬────────┘
+                                              │
+                                              ▼
+                                     ┌─────────────────┐
+                                     │ AWS EBS Volume  │
+                                     └─────────────────┘
 Project Structure
 student-registration-app/
 │
@@ -49,6 +67,8 @@ student-registration-app/
 ├── backend
 │   ├── Dockerfile
 │   ├── README.md
+│   ├── mvnw
+│   ├── mvnw.cmd
 │   ├── pom.xml
 │   ├── src
 │   └── yaml
@@ -56,8 +76,12 @@ student-registration-app/
 ├── frontend
 │   ├── Dockerfile
 │   ├── README.md
+│   ├── package.json
+│   ├── package-lock.json
 │   ├── src
-│   └── yaml
+│   ├── public
+│   ├── yaml
+│   └── vite.config.js
 │
 └── yaml
     ├── ebs-sc.yml
@@ -65,7 +89,6 @@ student-registration-app/
     ├── secret.yml
     ├── sts.yml
     └── svc.yml
-
 ```text
 User
  ↓
