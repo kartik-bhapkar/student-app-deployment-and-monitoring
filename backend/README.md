@@ -9,7 +9,7 @@ Open:
 ## pom.xml
 
 1. Add Spring Boot Actuator:
-```
+```xml
 <dependency>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-actuator</artifactId>
@@ -17,7 +17,7 @@ Open:
 ```
 
 2. Add Prometheus Registry:
-```
+```xml
 <dependency>
     <groupId>io.micrometer</groupId>
     <artifactId>micrometer-registry-prometheus</artifactId>
@@ -84,7 +84,7 @@ Step 6 - Backend Deployment
 
 deploy.yml
 
-```
+```yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -122,18 +122,18 @@ spec:
 ```
 
 Deploy:
-```
+```bash
 kubectl apply -f yaml/deploy.yml
 ```
 Verify:
-```
+```bash
 kubectl get deployments
 ```
 # Step 7 - Backend Service
 
 svc.yml
 
-```
+```yaml
 apiVersion: v1
 kind: Service
 
@@ -163,21 +163,21 @@ name: http
 is required for ServiceMonitor.
 
 Deploy:
-```
+```bash
 kubectl apply -f yaml/svc.yml
 ```
 Verify:
-```
+```bash
 kubectl get svc
 ```
 Check endpoints:
-```
+```bash
 kubectl get endpoints
 ```
 Step 8 - Configure HPA
 
 hpa.yml
-```
+```yaml
 apiVersion: autoscaling/v2
 
 kind: HorizontalPodAutoscaler
@@ -205,17 +205,17 @@ spec:
           averageUtilization: 50
 ```
 Deploy:
-```
+```bash
 kubectl apply -f yaml/hpa.yml
 ```
 Verify:
-```
+```bash
 kubectl get hpa
 ```
 # Step 9 - Configure ServiceMonitor
 
 servicemonitor.yml
-```
+```yaml
 apiVersion: monitoring.coreos.com/v1
 
 kind: ServiceMonitor
@@ -238,10 +238,10 @@ spec:
       interval: 15s
 ```
 Deploy:
-```
+```bash
 kubectl apply -f yaml/servicemonitor.yml
 ```
 Verify:
-```
+```bash
 kubectl get servicemonitor -A
 ```
