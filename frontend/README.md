@@ -1,3 +1,24 @@
+# Phase 18 - Frontend Deployment
+
+## Update .env
+
+Before:
+
+```env
+VITE_API_URL=http://BACKEND_IP:8080/api
+```
+
+After:
+
+```env
+VITE_API_URL=/api
+```
+
+Reason:
+
+Ingress will handle routing to backend services.
+
+---
 ## Frontend Dockerfile
 
 ```dockerfile
