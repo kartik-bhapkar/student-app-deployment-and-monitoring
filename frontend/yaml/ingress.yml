@@ -1,0 +1,25 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: student-app-ingress
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: a11fb1f3a493b4021be22253d07a06fb-1828951624.ap-south-1.elb.amazonaws.com
+      http:
+        paths:
+        - path: /
+          pathType: Prefix
+          backend:
+            service:
+              name: student-frontend-svc
+              port:
+                number: 80
+
+        - path: /api
+          pathType: Prefix
+          backend:
+            service:
+              name: student-app-svc
+              port:
+                number: 8080
