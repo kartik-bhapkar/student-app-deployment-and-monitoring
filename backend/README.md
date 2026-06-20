@@ -15,6 +15,7 @@ Open:
     <artifactId>spring-boot-starter-actuator</artifactId>
 </dependency>
 ```
+
 ```Add Prometheus Registry:
 
 <dependency>
