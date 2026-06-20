@@ -8,8 +8,8 @@ Open:
 
 ## pom.xml
 
-```Add Spring Boot Actuator:
-
+Add Spring Boot Actuator:
+```
 <dependency>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-actuator</artifactId>
