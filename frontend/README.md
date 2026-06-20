@@ -1,56 +1,244 @@
-# React Project Setup and Deployment Guide for Windows
+## Frontend Dockerfile
 
-This guide provides step-by-step instructions for setting up a React project.
+```dockerfile
+FROM node:20 AS builder
 
-## 1. Setting Up the React Project
+WORKDIR /app
 
-### Install Node.js and npm
+COPY . .
 
-```shell
-apt update && apt install nodejs npm -y
+RUN npm install
+
+RUN npm run build
+
+FROM nginx:alpine
+
+COPY --from=builder /app/dist/. /usr/share/nginx/html/
+
+EXPOSE 80
+
+CMD ["nginx","-g","daemon off;"]
 ```
 
-### Verify Installation
+---
 
+## Build Frontend Image
 
-```shell
-node -v
-npm -v
+```bash
+docker build -t <dockerhub-username>/frontend:latest .
 ```
 
+---
 
-## 2. Install Dependencies
+## Push Frontend Image
 
-To install the necessary dependencies for your project, run the following command:
-
-```shell
-npm install
+```bash
+docker push <dockerhub-username>/frontend:latest
 ```
 
-## 3. Build the React Application for Production
+---
 
-Update backend URL in .env file
+## Frontend Kubernetes Resources
 
-```shell
-vim .env 
-
-    VITE_API_URL = "http://<BACKEND_PUBLIC_IP>:8080/api"
+```text
+deployment.yaml
+service.yaml
 ```
 
-To build the React application for production, run:
+Apply:
 
-```shell
-npm run build
+```bash
+kubectl apply -f deployment.yaml
+kubectl apply -f service.yaml
 ```
 
-This will create a dist/ directory in your project containing optimized, production-ready files.
+Verify:
 
-## 4. Deploy production-ready files on s3 or apache2 server
-
-```shell
-apt install apache2 -y
-systemctl start apache2
-cp -rf dist/* /var/www/html/
+```bash
+kubectl get pods
+kubectl get svc
 ```
 
-You can access the application on http://localhost:80
+---
+
+# Phase 10 - Ingress Configuration
+
+Create:
+
+```text
+ingress.yaml
+```
+
+Ingress Routes:
+
+```text
+/      -> student-frontend-svc:80
+/api   -> student-app-svc:8080
+```
+
+Apply:
+
+```bash
+kubectl apply -f ingress.yaml
+```
+
+Verify:
+
+```bash
+kubectl describe ingress student-app-ingress
+```
+
+Expected:
+
+```text
+/      student-frontend-svc:80
+/api   student-app-svc:8080
+```
+
+---
+
+# Phase 11 - Application Validation
+
+Check all resources:
+
+```bash
+kubectl get nodes
+kubectl get pods
+kubectl get svc
+kubectl get pvc
+kubectl get hpa
+kubectl get ingress
+```
+
+Retrieve Load Balancer DNS:
+
+```bash
+kubectl get svc -n ingress-nginx
+```
+
+Open:
+
+```text
+http://<LOAD_BALANCER_DNS>
+```
+
+Expected:
+
+* Frontend loads successfully
+* User registration works
+* Backend APIs respond successfully
+* Data is stored in MariaDB
+* Persistent storage attached through EBS
+
+---
+
+# Troubleshooting
+
+## Node Group Stuck in Creating
+
+Cause:
+
+```text
+UnauthorizedOperation
+ec2:DescribeInstances
+```
+
+Fix:
+
+Attach:
+
+```text
+AmazonEKSComputePolicy
+```
+
+to Node IAM Role.
+
+---
+
+## ImagePullBackOff
+
+Cause:
+
+Docker image not pushed.
+
+Fix:
+
+```bash
+docker push <image>
+```
+
+---
+
+## CrashLoopBackOff
+
+Cause:
+
+Database configuration or Secret issues.
+
+Fix:
+
+Verify Secret references and environment variables.
+
+---
+
+## Frontend White Screen
+
+Cause:
+
+Incorrect Docker COPY command.
+
+Incorrect:
+
+```dockerfile
+COPY --from=builder /app/dist/* /usr/share/nginx/html
+```
+
+Correct:
+
+```dockerfile
+COPY --from=builder /app/dist/. /usr/share/nginx/html/
+```
+
+---
+
+## API Connection Refused
+
+Cause:
+
+Frontend using backend node IP.
+
+Incorrect:
+
+```env
+VITE_API_URL=http://BACKEND_IP:8080/api
+```
+
+Correct:
+
+```env
+VITE_API_URL=/api
+```
+
+with Ingress routing.
+
+---
+
+# Final Outcome
+
+Successfully deployed a production-style application on AWS EKS using:
+
+* Amazon EKS
+* Managed Node Groups
+* Kubernetes Deployments
+* StatefulSets
+* Persistent Volumes
+* EBS CSI Driver
+* Kubernetes Secrets
+* Horizontal Pod Autoscaler
+* NGINX Ingress Controller
+* Docker
+* React
+* Spring Boot
+* MariaDB
+
+This project demonstrates end-to-end Kubernetes deployment, storage management, networking, autoscaling, and troubleshooting on AWS.
