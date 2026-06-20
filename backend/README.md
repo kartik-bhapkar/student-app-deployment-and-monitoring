@@ -84,6 +84,7 @@ Step 6 - Backend Deployment
 
 deploy.yml
 
+```
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -118,18 +119,21 @@ spec:
             limits:
               memory: "500Mi"
               cpu: "500m"
+```
 
 Deploy:
-
+```
 kubectl apply -f yaml/deploy.yml
-
+```
 Verify:
-
+```
 kubectl get deployments
-Step 7 - Backend Service
+```
+# Step 7 - Backend Service
 
 svc.yml
 
+```
 apiVersion: v1
 kind: Service
 
@@ -148,6 +152,7 @@ spec:
       targetPort: 8080
 
   type: ClusterIP
+```
 
 Important:
 
@@ -158,20 +163,21 @@ name: http
 is required for ServiceMonitor.
 
 Deploy:
-
+```
 kubectl apply -f yaml/svc.yml
-
+```
 Verify:
-
+```
 kubectl get svc
-
+```
 Check endpoints:
-
+```
 kubectl get endpoints
+```
 Step 8 - Configure HPA
 
 hpa.yml
-
+```
 apiVersion: autoscaling/v2
 
 kind: HorizontalPodAutoscaler
@@ -197,18 +203,19 @@ spec:
         target:
           type: Utilization
           averageUtilization: 50
-
+```
 Deploy:
-
+```
 kubectl apply -f yaml/hpa.yml
-
+```
 Verify:
-
+```
 kubectl get hpa
-Step 9 - Configure ServiceMonitor
+```
+# Step 9 - Configure ServiceMonitor
 
 servicemonitor.yml
-
+```
 apiVersion: monitoring.coreos.com/v1
 
 kind: ServiceMonitor
@@ -229,11 +236,12 @@ spec:
     - port: http
       path: /actuator/prometheus
       interval: 15s
-
+```
 Deploy:
-
+```
 kubectl apply -f yaml/servicemonitor.yml
-
+```
 Verify:
-
+```
 kubectl get servicemonitor -A
+```
