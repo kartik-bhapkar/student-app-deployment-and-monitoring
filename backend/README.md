@@ -157,9 +157,9 @@ spec:
 Important:
 
 The port name:
-
+```
 name: http
-
+```
 is required for ServiceMonitor.
 
 Deploy:
