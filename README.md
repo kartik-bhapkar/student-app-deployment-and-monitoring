@@ -26,27 +26,20 @@ This project demonstrates the complete deployment of a full-stack Student Regist
 Architecture
 User
  │
- ▼
 AWS Load Balancer
  │
- ▼
 NGINX Ingress Controller
  │
  ├────────────► Frontend Service
  │                     │
- │                     ▼
  │              React Application
  │
- ▼
 Backend Service
  │
- ▼
 Spring Boot Application
  │
- ▼
 MariaDB StatefulSet
  │
- ▼
 AWS EBS Volume
 Project Structure
 student-registration-app/
