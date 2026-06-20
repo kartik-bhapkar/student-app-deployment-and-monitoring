@@ -2,7 +2,7 @@ backend of the student-deployment application
 
 ---
 
-Step 1 - Add Required Dependencies
+Phase 1 - Add Required Dependencies
 
 Open:
 
@@ -27,20 +27,6 @@ Open:
 # Phase 10 - Backend Deployment
 
 ## application.properties Changes
-
-Before:
-
-```properties
-spring.datasource.url=jdbc:mariadb://localhost:3306/student_db
-spring.datasource.password=redhat
-```
-
-After:
-
-```properties
-spring.datasource.url=jdbc:mariadb://student-db-svc:3306/${DB_NAME}
-spring.datasource.password=${DB_PASSWORD}
-```
 
 Using Kubernetes Secrets for database configuration.
 
@@ -96,7 +82,7 @@ docker push kartikbhapkar07/monitor-be:latest
 
 ---
 
-Step 6 - Backend Deployment
+# Step 6 - Backend Deployment
 
 deploy.yml
 
