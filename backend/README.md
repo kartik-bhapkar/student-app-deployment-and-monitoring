@@ -8,7 +8,7 @@ Open:
 
 ## pom.xml
 
-## Add Spring Boot Actuator:
+1. Add Spring Boot Actuator:
 ```
 <dependency>
     <groupId>org.springframework.boot</groupId>
@@ -16,7 +16,7 @@ Open:
 </dependency>
 ```
 
-## Add Prometheus Registry:
+2. Add Prometheus Registry:
 ```
 <dependency>
     <groupId>io.micrometer</groupId>
