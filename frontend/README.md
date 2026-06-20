@@ -40,9 +40,52 @@ docker push <dockerhub-username>/frontend:latest
 
 ## Frontend Kubernetes Resources
 
-```text
+text
 deployment.yaml
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: student-frontend-deploy
+spec:
+  replicas: 2
+  selector:
+    matchExpressions:
+      - {key: app, operator: In, values: [student-frontend]}
+  template:
+    metadata:
+      name: pod-01
+      labels:
+        app: student-frontend
+    spec:
+      containers:
+        - name: student-frontend-container
+          image: kartikbhapkar07/monitor-fe:latest
+          ports:
+            - containerPort: 80
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "100m"
+            limits:
+              memory: "500Mi"
+              cpu: "500m"
+```
+
 service.yaml
+```yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: student-frontend-svc
+spec:
+  selector:
+    app: student-frontend
+  ports:
+    - port: 80
+      targetPort: 80
+      protocol: TCP
+  type: ClusterIP
 ```
 
 Apply:
@@ -65,8 +108,34 @@ kubectl get svc
 
 Create:
 
-```text
+
 ingress.yaml
+```yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: student-app-ingress
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: a11fb1f3a493b4021be22253d07a06fb-1828951624.ap-south-1.elb.amazonaws.com
+      http:
+        paths:
+        - path: /
+          pathType: Prefix
+          backend:
+            service:
+              name: student-frontend-svc
+              port:
+                number: 80
+
+        - path: /api
+          pathType: Prefix
+          backend:
+            service:
+              name: student-app-svc
+              port:
+                number: 8080
 ```
 
 Ingress Routes:
