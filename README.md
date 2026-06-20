@@ -30,7 +30,7 @@ AWS Load Balancer
  │
 NGINX Ingress Controller
  │
- ├────────────► Frontend Service
+ |──────────── Frontend Service
  │                     │
  │              React Application
  │
