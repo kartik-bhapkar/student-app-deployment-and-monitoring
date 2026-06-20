@@ -222,99 +222,55 @@ Expected:
 
 ---
 
-# Monitoring Setup (Prometheus + Grafana)
+# Monitoring Verification & Dashboard Access
 
-After deploying the frontend, backend, and database components, install Prometheus and Grafana to collect and visualize metrics from the Kubernetes cluster and Spring Boot application.
+The monitoring stack (Prometheus + Grafana) has already been installed in the cluster.
 
----
-
-## Install Monitoring Stack
-
-### Create Monitoring Namespace
-
-```bash
-kubectl create namespace monitoring
-```
-
-### Add Helm Repositories
-
-```bash
-helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
-
-helm repo add grafana https://grafana.github.io/helm-charts
-
-helm repo update
-```
-
-### Install Kube Prometheus Stack
-
-```bash
-helm install monitoring prometheus-community/kube-prometheus-stack \
--n monitoring \
---create-namespace
-```
-
-### Verify Installation
-
-```bash
-kubectl get pods -n monitoring
-```
-
-Expected Components:
-
-- Prometheus
-- Grafana
-- Alertmanager
-- Prometheus Operator
-- kube-state-metrics
-- Node Exporter
-
----
-
-## Verify Prometheus CRDs
-
-ServiceMonitor requires Prometheus CRDs.
-
-```bash
-kubectl get crds | grep monitoring.coreos.com
-```
-
-Expected Output:
+The Spring Boot application exposes metrics through:
 
 ```text
-alertmanagers.monitoring.coreos.com
-prometheuses.monitoring.coreos.com
-servicemonitors.monitoring.coreos.com
-podmonitors.monitoring.coreos.com
+/actuator/prometheus
 ```
+
+Prometheus scrapes these metrics using the configured ServiceMonitor.
 
 ---
 
-## Deploy ServiceMonitor
+## Verify ServiceMonitor
 
-Apply the ServiceMonitor resource.
-
-```bash
-kubectl apply -f backend/yaml/servicemonitor.yml
-```
-
-Verify:
+Check whether the ServiceMonitor is deployed:
 
 ```bash
 kubectl get servicemonitor -A
 ```
 
-Expected:
+Expected Output:
 
 ```text
-student-app-monitor
+monitoring   student-app-monitor
+```
+
+---
+
+## Verify Backend Service Endpoints
+
+Check whether the backend service is discovering application pods:
+
+```bash
+kubectl get endpoints student-app-svc
+```
+
+Expected Output:
+
+```text
+student-app-svc   <pod-ip>:8080
 ```
 
 ---
 
 ## Verify Spring Boot Metrics Endpoint
 
-Port forward backend service:
+Port-forward the backend service:
 
 ```bash
 kubectl port-forward svc/student-app-svc 8080:8080
@@ -326,21 +282,21 @@ Open:
 http://localhost:8080/actuator/prometheus
 ```
 
-You should see metrics similar to:
+Expected Output:
 
 ```text
 jvm_memory_used_bytes
-jvm_memory_max_bytes
 process_cpu_usage
 system_cpu_usage
 http_server_requests_seconds_count
+...
 ```
 
 ---
 
-## Access Prometheus
+# Access Prometheus
 
-Port forward Prometheus:
+Port-forward Prometheus:
 
 ```bash
 kubectl port-forward \
@@ -355,19 +311,23 @@ Open:
 http://localhost:9090
 ```
 
+---
+
+## Verify Prometheus Targets
+
 Navigate to:
 
 ```text
 Status → Targets
 ```
 
-Verify:
+Verify that:
 
 ```text
 student-app-monitor
 ```
 
-Target State:
+appears with status:
 
 ```text
 UP
@@ -375,7 +335,7 @@ UP
 
 ---
 
-## Access Grafana
+# Access Grafana
 
 Get Grafana Admin Password:
 
@@ -391,7 +351,7 @@ Default Username:
 admin
 ```
 
-Port Forward Grafana:
+Port-forward Grafana:
 
 ```bash
 kubectl port-forward svc/monitoring-grafana 3000:80 -n monitoring
@@ -403,22 +363,18 @@ Open:
 http://localhost:3000
 ```
 
-Login:
+Login using:
 
 ```text
 Username: admin
-Password: <password from previous command>
+Password: <password-from-previous-command>
 ```
 
 ---
 
-## Configure Prometheus Datasource
+# Configure Prometheus Datasource
 
-Find Prometheus Service:
-
-```bash
-kubectl get svc -n monitoring
-```
+If Prometheus datasource is not automatically available, add it manually.
 
 Datasource URL:
 
@@ -435,12 +391,6 @@ Connections
            └── Prometheus
 ```
 
-Enter:
-
-```text
-http://monitoring-kube-prometheus-prometheus.monitoring:9090
-```
-
 Click:
 
 ```text
@@ -450,88 +400,62 @@ Save & Test
 Expected Result:
 
 ```text
-Data source is working
+Datasource is working
 ```
 
 ---
 
 # Useful Prometheus Queries
 
-## Spring Boot Metrics
-
-### JVM Memory Used
+## JVM Memory Usage
 
 ```promql
 jvm_memory_used_bytes
 ```
 
-### JVM Maximum Memory
-
-```promql
-jvm_memory_max_bytes
-```
-
-### Process CPU Usage
+## CPU Usage
 
 ```promql
 process_cpu_usage
 ```
 
-### System CPU Usage
+## System CPU Usage
 
 ```promql
 system_cpu_usage
 ```
 
-### Total HTTP Requests
+## Total HTTP Requests
 
 ```promql
 http_server_requests_seconds_count
 ```
 
-### Request Rate
+## Request Rate
 
 ```promql
 rate(http_server_requests_seconds_count[1m])
 ```
 
-### Average Response Time
-
-```promql
-rate(http_server_requests_seconds_sum[5m])
-/
-rate(http_server_requests_seconds_count[5m])
-```
-
----
-
-## Kubernetes Metrics
-
-### Running Pods
+## Running Pods
 
 ```promql
 count(kube_pod_status_phase{phase="Running"})
 ```
 
-### Deployment Replicas
-
-```promql
-kube_deployment_status_replicas_available
-```
-
-### HPA Current Replicas
+## HPA Current Replicas
 
 ```promql
 kube_horizontalpodautoscaler_status_current_replicas
 ```
 
-### Node CPU Usage
+## Node CPU Usage
 
 ```promql
 100 - (avg(rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100)
 ```
 
-### Node Memory Usage
+## Node Memory Usage
 
 ```promql
 (node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes)
@@ -541,31 +465,30 @@ node_memory_MemTotal_bytes * 100
 
 ---
 
-## Monitoring Flow
+# Monitoring Flow
 
 ```text
 Spring Boot Application
           │
-          │  /actuator/prometheus
           ▼
-Kubernetes Service
+ /actuator/prometheus
           │
           ▼
-ServiceMonitor
+     ServiceMonitor
           │
           ▼
-Prometheus
+      Prometheus
           │
           ▼
-Grafana
+        Grafana
           │
           ▼
-Dashboards & Visualization
+     Dashboards
 ```
 
 ---
 
-## Verification Commands
+# Monitoring Health Check Commands
 
 ```bash
 kubectl get pods -n monitoring
@@ -576,39 +499,10 @@ kubectl get svc -n monitoring
 
 kubectl get endpoints student-app-svc
 
-kubectl port-forward svc/monitoring-grafana 3000:80 -n monitoring
+kubectl logs -n monitoring deployment/monitoring-grafana
 
-kubectl port-forward svc/monitoring-kube-prometheus-prometheus 9090:9090 -n monitoring
+kubectl logs -n monitoring prometheus-monitoring-kube-prometheus-prometheus-0
 ```
-
----
-
-## Project Monitoring Architecture
-
-```text
-Spring Boot Application
-        │
-        ├── JVM Metrics
-        ├── HTTP Metrics
-        ├── CPU Metrics
-        └── Memory Metrics
-                │
-                ▼
-       /actuator/prometheus
-                │
-                ▼
-          ServiceMonitor
-                │
-                ▼
-           Prometheus
-                │
-                ▼
-            Grafana
-                │
-                ▼
-         Custom Dashboards
-```
-
 # Troubleshooting
 
 ## Node Group Stuck in Creating
